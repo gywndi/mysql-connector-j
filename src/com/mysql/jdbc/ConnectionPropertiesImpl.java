@@ -708,7 +708,10 @@ public class ConnectionPropertiesImpl implements Serializable, ConnectionPropert
 
     private BooleanConnectionProperty autoReconnect = new BooleanConnectionProperty("autoReconnect", false,
             Messages.getString("ConnectionProperties.autoReconnect"), "1.1", HA_CATEGORY, 0);
-
+  
+    private BooleanConnectionProperty reconnectForceNew = new BooleanConnectionProperty("reconnectForceNew", false,
+            Messages.getString("ConnectionProperties.reconnectForceNew"), "5.1.38", HA_CATEGORY, 0);
+  
     private BooleanConnectionProperty autoReconnectForPools = new BooleanConnectionProperty("autoReconnectForPools", false,
             Messages.getString("ConnectionProperties.autoReconnectForPools"), "3.1.3", HA_CATEGORY, 1);
 
@@ -1858,6 +1861,10 @@ public class ConnectionPropertiesImpl implements Serializable, ConnectionPropert
         return this.highAvailabilityAsBoolean;
     }
 
+    protected boolean getHighAvailabilityWithNewSession() {
+        return this.highAvailabilityWithNewSessionAsBoolean;
+    }
+
     /*
      * (non-Javadoc)
      * 
@@ -2565,6 +2572,7 @@ public class ConnectionPropertiesImpl implements Serializable, ConnectionPropert
         this.useUnicodeAsBoolean = this.useUnicode.getValueAsBoolean();
         this.characterEncodingAsString = ((String) this.characterEncoding.getValueAsObject());
         this.highAvailabilityAsBoolean = this.autoReconnect.getValueAsBoolean();
+        this.highAvailabilityWithNewSessionAsBoolean = this.reconnectForceNew.getValueAsBoolean();
         this.autoReconnectForPoolsAsBoolean = this.autoReconnectForPools.getValueAsBoolean();
         this.maxRowsAsInt = ((Integer) this.maxRows.getValueAsObject()).intValue();
         this.profileSQLAsBoolean = this.profileSQL.getValueAsBoolean();
