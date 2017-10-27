@@ -847,6 +847,7 @@ public class ConnectionPropertiesImpl implements Serializable, ConnectionPropert
             Messages.getString("ConnectionProperties.generateSimpleParameterMetadata"), "5.0.5", MISC_CATEGORY, Integer.MIN_VALUE);
 
     private boolean highAvailabilityAsBoolean = false;
+    private boolean highAvailabilityWithNewSessionAsBoolean = false;
 
     private BooleanConnectionProperty holdResultsOpenOverStatementClose = new BooleanConnectionProperty("holdResultsOpenOverStatementClose", false,
             Messages.getString("ConnectionProperties.holdRSOpenOverStmtClose"), "3.1.7", PERFORMANCE_CATEGORY, Integer.MIN_VALUE);
