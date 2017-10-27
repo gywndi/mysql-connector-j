@@ -2022,8 +2022,19 @@ public class ConnectionImpl extends ConnectionPropertiesImpl implements MySQLCon
             connectWithRetries(isForReconnect, mergedProps);
         }
     }
+  
+    public void createNewBankIO(boolean isForReconnect) throws SQLException {
+        synchronized (getConnectionMutex()) {
+            Properties mergedProps = exposeAsProperties(this.props);
+            connectWithRetries(isForReconnect, mergedProps, true);
+        }
+    }
 
     private void connectWithRetries(boolean isForReconnect, Properties mergedProps) throws SQLException {
+    	connectWithRetries(isForReconnect, mergedProps, false);
+    }
+  
+    private void connectWithRetries(boolean isForReconnect, Properties mergedProps, boolean checkForClosedConnection) throws SQLException {
         double timeout = getInitialTimeout();
         boolean connectionGood = false;
 
@@ -2036,7 +2047,10 @@ public class ConnectionImpl extends ConnectionPropertiesImpl implements MySQLCon
                 }
 
                 coreConnect(mergedProps);
-                pingInternal(false, 0);
+                pingInternal(checkForClosedConnection, 0);
+                if(checkForClosedConnection){
+                    this.needsPing = false;
+                }
 
                 boolean oldAutoCommit;
                 int oldIsolationLevel;
@@ -2463,13 +2477,16 @@ public class ConnectionImpl extends ConnectionPropertiesImpl implements MySQLCon
             this.lastQueryFinishedTime = 0; // we're busy!
 
             if ((getHighAvailability()) && (this.autoCommit || getAutoReconnectForPools()) && this.needsPing && !isBatch) {
-                try {
-                    pingInternal(false, 0);
-
-                    this.needsPing = false;
-                } catch (Exception Ex) {
-                    createNewIO(true);
-                }
+                if(!getHighAvailabilityWithNewSession()){
+                    try {
+                  			pingInternal(false, 0);
+                  			this.needsPing = false;
+                 		} catch (Exception Ex) {
+                   			createNewIO(true);
+            		    }    
+            	  }else{
+            		    createNewBankIO(true);        		
+              	}
             }
 
             try {
